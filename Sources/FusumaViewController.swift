@@ -229,7 +229,8 @@ public class FusumaViewController: UIViewController {
         photoLibraryViewerContainer.addSubview(albumView)
         cameraShotContainer.addSubview(cameraView)
         videoShotContainer.addSubview(videoView)
-        
+
+        titleLabel.text = NSLocalizedString(fusumaCameraRollTitle, comment: fusumaCameraRollTitle)
         titleLabel.textColor = fusumaBaseTintColor
         titleLabel.font      = fusumaTitleFont
         
