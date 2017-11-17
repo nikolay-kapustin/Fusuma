@@ -56,9 +56,7 @@ final class FSVideoCameraView: UIView {
         
         for device in AVCaptureDevice.devices() {
             
-            if let device = device as? AVCaptureDevice,
-                device.position == AVCaptureDevice.Position.back {
-                
+            if device.position == AVCaptureDevice.Position.back {
                 self.device = device
             }
         }
@@ -105,25 +103,16 @@ final class FSVideoCameraView: UIView {
         flashOnImage = fusumaFlashOnImage != nil ? fusumaFlashOnImage : UIImage(named: "ic_flash_on", in: bundle, compatibleWith: nil)
         flashOffImage = fusumaFlashOffImage != nil ? fusumaFlashOffImage : UIImage(named: "ic_flash_off", in: bundle, compatibleWith: nil)
         let flipImage = fusumaFlipImage != nil ? fusumaFlipImage : UIImage(named: "ic_loop", in: bundle, compatibleWith: nil)
-        videoStartImage = fusumaVideoStartImage != nil ? fusumaVideoStartImage : UIImage(named: "video_button", in: bundle, compatibleWith: nil)
-        videoStopImage = fusumaVideoStopImage != nil ? fusumaVideoStopImage : UIImage(named: "video_button_rec", in: bundle, compatibleWith: nil)
+        videoStartImage = fusumaVideoStartImage != nil ? fusumaVideoStartImage : UIImage(named: "ic_shutter", in: bundle, compatibleWith: nil)
+        videoStopImage = fusumaVideoStopImage != nil ? fusumaVideoStopImage : UIImage(named: "ic_shutter_recording", in: bundle, compatibleWith: nil)
         
-        if fusumaTintIcons {
-            
-            flashButton.tintColor = fusumaBaseTintColor
-            flipButton.tintColor  = fusumaBaseTintColor
-            shotButton.tintColor  = fusumaBaseTintColor
-            
-            flashButton.setImage(flashOffImage?.withRenderingMode(.alwaysTemplate), for: UIControlState())
-            flipButton.setImage(flipImage?.withRenderingMode(.alwaysTemplate), for: UIControlState())
-            shotButton.setImage(videoStartImage?.withRenderingMode(.alwaysTemplate), for: UIControlState())
-            
-        } else {
-            
-            flashButton.setImage(flashOffImage, for: UIControlState())
-            flipButton.setImage(flipImage, for: UIControlState())
-            shotButton.setImage(videoStartImage, for: UIControlState())
-        }
+        flashButton.tintColor = fusumaBaseTintColor
+        flipButton.tintColor  = fusumaBaseTintColor
+        shotButton.tintColor  = fusumaBaseTintColor
+        
+        flashButton.setImage(flashOffImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+        flipButton.setImage(flipImage?.withRenderingMode(.alwaysTemplate), for: .normal)
+        shotButton.setImage(videoStartImage?.withRenderingMode(.alwaysTemplate), for: .normal)
         
         flashConfiguration()
         
@@ -176,19 +165,14 @@ final class FSVideoCameraView: UIView {
             session.beginConfiguration()
             
             for input in session.inputs {
-                
-                if let input = input as? AVCaptureInput {
-                    
-                    session.removeInput(input)
-                }
+                session.removeInput(input)
             }
             
             let position = videoInput?.device.position == AVCaptureDevice.Position.front ? AVCaptureDevice.Position.back : AVCaptureDevice.Position.front
             
             for device in AVCaptureDevice.devices(for: AVMediaType.video) {
                 
-                if let device = device as? AVCaptureDevice,
-                    device.position == position {
+                if device.position == position {
                     
                     videoInput = try AVCaptureDeviceInput(device: device)
                     session.addInput(videoInput!)
