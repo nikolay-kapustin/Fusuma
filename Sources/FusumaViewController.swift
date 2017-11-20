@@ -117,6 +117,7 @@ public struct ImageMetadata {
     @IBOutlet weak var cameraShotContainer: UIView!
     @IBOutlet weak var videoShotContainer: UIView!
 
+    @IBOutlet weak var menuViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var menuView: UIView!
     @IBOutlet weak var closeButton: UIButton!
@@ -157,8 +158,9 @@ public struct ImageMetadata {
         cameraButton.setTitle(fusumaCameraTitle, for: .normal)
         videoButton.setTitle(fusumaVideoTitle, for: .normal)
 
+        menuViewHeightConstraint.constant = heightMenuView
         menuView.backgroundColor = fusumaBackgroundColor
-        menuView.addBottomBorder(UIColor.black, width: 1.0)
+        //menuView.addBottomBorder(UIColor.black, width: 1.0)
 
         albumView.allowMultipleSelection = allowMultipleSelection
         
@@ -541,6 +543,9 @@ extension FusumaViewController: FSAlbumViewDelegate, FSCameraViewDelegate, FSVid
 }
 
 private extension FusumaViewController {
+    var heightMenuView: CGFloat {
+        return UIScreen.main.bounds.height == 812 ? 90:50 //iPhone X adoption
+    }
     
     func stopAll() {
         
@@ -662,4 +667,6 @@ private extension FusumaViewController {
             return videoButton
         }
     }
+
+
 }

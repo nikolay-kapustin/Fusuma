@@ -104,17 +104,16 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         
         // Sorting condition
         let options = PHFetchOptions()
-        options.sortDescriptors = [
-            NSSortDescriptor(key: "creationDate", ascending: false)
-        ]
-        
-        images = PHAsset.fetchAssets(with: .image, options: options)
+        options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+
+        images = PHAsset.fetchAssets(with: options)
         
         if images.count > 0 {
-            
-            changeImage(images[0])
+            let last = images.count-1
+
+            changeImage(images[last])
             collectionView.reloadData()
-            collectionView.selectItem(at: IndexPath(row: 0, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition())
+            collectionView.selectItem(at: IndexPath(row: last, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition())
         }
         
         PHPhotoLibrary.shared().register(self)
@@ -266,7 +265,7 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         let currentTag = cell.tag + 1
         cell.tag = currentTag
         
-        let asset = self.images[(indexPath as NSIndexPath).item]
+        let asset = self.images[self.indexPath(indexPath)]
         
         self.imageManager?.requestImage(for: asset,
             targetSize: cellSize,
@@ -301,7 +300,7 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        changeImage(images[(indexPath as NSIndexPath).row])
+        changeImage(images[self.indexPath(indexPath)])
         
         imageCropView.changeScrollable(true)
         
@@ -322,7 +321,7 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
     
     func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
         
-        let asset = self.images[(indexPath as NSIndexPath).item]
+        let asset = self.images[self.indexPath(indexPath)]
         
         let selectedAsset = selectedAssets.enumerated().filter ({ $0.1 == asset }).first
         
@@ -605,10 +604,14 @@ private extension FSAlbumView {
         
         for indexPath in indexPaths {
         
-            let asset = self.images[(indexPath as NSIndexPath).item]
+            let asset = self.images[self.indexPath(indexPath)]
             assets.append(asset)
         }
         
         return assets
+    }
+    func indexPath(_ path:IndexPath) -> Int {
+        guard images.count > 0 else {return 0}
+        return images.count - path.item - 1
     }
 }
