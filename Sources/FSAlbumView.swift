@@ -103,10 +103,25 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         checkPhotoAuth()
         
         // Sorting condition
-        let options = PHFetchOptions()
-        options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+        let assetOptions = PHFetchOptions()
+        assetOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
 
-        images = PHAsset.fetchAssets(with: options)
+        let assetCollections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumUserLibrary, options: nil)
+
+        var allPhotos:PHAssetCollection!
+
+        if assetCollections.count == 1 {
+            allPhotos = assetCollections.firstObject!
+        }
+//    else if assetCollections.count > 1 {
+//        for index in 0...assetCollections.count-1 {
+//            let asset = assetCollections[index]
+//        }
+//    }
+        else {
+            return
+        }
+        images = PHAsset.fetchAssets(in: allPhotos!, options: assetOptions)
         
         if images.count > 0 {
             let last = images.count-1
