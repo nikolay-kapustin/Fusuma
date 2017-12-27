@@ -100,6 +100,8 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         collectionView.allowsMultipleSelection = allowMultipleSelection
         
         // Never load photos Unless the user allows to access to photo album
+        PHPhotoLibrary.shared().register(self)
+
         checkPhotoAuth()
         
         // Sorting condition
@@ -131,10 +133,34 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
             collectionView.selectItem(at: IndexPath(row: last, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition())
         }
         
-        PHPhotoLibrary.shared().register(self)
-        
     }
-    
+
+    func reloadRequestAssetsCollection(){
+        // Sorting condition
+        let assetOptions = PHFetchOptions()
+        assetOptions.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.image.rawValue)
+
+        let assetCollections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .smartAlbumUserLibrary, options: nil)
+
+        var allPhotos:PHAssetCollection!
+
+        if assetCollections.count == 1 {
+            allPhotos = assetCollections.firstObject!
+        }
+        else {
+            return
+        }
+        images = PHAsset.fetchAssets(in: allPhotos!, options: assetOptions)
+
+        if images.count > 0 {
+            let last = images.count-1
+
+            changeImage(images[last])
+            collectionView.reloadData()
+            collectionView.selectItem(at: IndexPath(row: last, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition())
+        }
+    }
+
     deinit {
         
         if PHPhotoLibrary.authorizationStatus() == PHAuthorizationStatus.authorized {
@@ -483,7 +509,9 @@ private extension FSAlbumView {
     
     // Check the status of authorization for PHPhotoLibrary
     func checkPhotoAuth() {
-        
+//        if PHPhotoLibrary.authorizationStatus() != .notDetermined {
+//            return
+//        }
         PHPhotoLibrary.requestAuthorization { (status) -> Void in
             
             switch status {
@@ -491,14 +519,18 @@ private extension FSAlbumView {
             case .authorized:
             
                 self.imageManager = PHCachingImageManager()
-                
+
                 if let images = self.images, images.count > 0 {
-                    
-                    self.changeImage(images[0])
+                    let last = images.count-1
+                    self.changeImage(images[last])
                 }
-                
+                else {
+                    DispatchQueue.main.async {
+                        self.reloadRequestAssetsCollection()
+                    }
+                }
+
                 DispatchQueue.main.async {
-                    
                     self.delegate?.albumViewCameraRollAuthorized()
                 }
                 
