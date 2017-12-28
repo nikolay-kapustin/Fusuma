@@ -100,7 +100,6 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         collectionView.allowsMultipleSelection = allowMultipleSelection
         
         // Never load photos Unless the user allows to access to photo album
-        PHPhotoLibrary.shared().register(self)
 
         checkPhotoAuth()
         
@@ -132,7 +131,7 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
             collectionView.reloadData()
             collectionView.selectItem(at: IndexPath(row: last, section: 0), animated: false, scrollPosition: UICollectionViewScrollPosition())
         }
-        
+        PHPhotoLibrary.shared().register(self)
     }
 
 //    func reloadRequestAssetsCollection(){
